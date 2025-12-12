@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Optional, Dict, Any, List, Tuple
-
 import base64
 import httpx
 import statistics
@@ -11,37 +10,47 @@ from app.core.config import (
     FEATURE_ADZUNA,
     ONET_USER,
     ONET_API_KEY,
+    ONET_BASE,
+    ONET_SEARCH_PATH,
+    ONET_SEARCH_QUERY_PARAM,
+    ONET_DETAILS_PATH,
+    ONET_SKILLS_PATH,
     ADZUNA_APP_ID,
     ADZUNA_APP_KEY,
     ADZUNA_COUNTRY,
 )
-
-ONET_BASE = "https://services.onetcenter.org"
 ADZUNA_BASE = "https://api.adzuna.com/v1/api"
 
 
 def _ensure_onet_ready() -> None:
     if not FEATURE_ONET:
         raise RuntimeError("FEATURE_ONET must be enabled for O*NET lookups")
-    if not ONET_USER or not ONET_API_KEY:
-        raise RuntimeError("O*NET credentials are required")
+    if not ONET_API_KEY:
+        raise RuntimeError("O*NET API key is required")
 
 
 def _onet_headers() -> Dict[str, str]:
     _ensure_onet_ready()
-    token = base64.b64encode(f"{ONET_USER}:{ONET_API_KEY}".encode()).decode()
-    return {
-        "Authorization": f"Basic {token}",
-        "Accept": "application/json",
-    }
+    # v2 uses X-API-Key; legacy can still accept Basic. Send both when available.
+    headers: Dict[str, str] = {"Accept": "application/json"}
+    if ONET_API_KEY:
+        headers["X-API-Key"] = ONET_API_KEY
+    if ONET_USER and ONET_API_KEY:
+        token = f"{ONET_USER}:{ONET_API_KEY}"
+        headers["Authorization"] = f"Basic {base64.b64encode(token.encode()).decode()}"
+    return headers
 
 
 async def onet_search_occupations(keywords: str, limit: int = 20) -> List[Dict[str, Any]]:
     _ensure_onet_ready()
-    url = f"{ONET_BASE}/ws/online/search"
-    params = {"keyword": keywords, "end": limit, "fmt": "json"}
+    url = f"{ONET_BASE}{ONET_SEARCH_PATH}"
+    params = {ONET_SEARCH_QUERY_PARAM: keywords, "end": limit, "fmt": "json"}
     async with httpx.AsyncClient(timeout=30) as client:
-        response = await client.get(url, headers=_onet_headers(), params=params)
+        response = await client.get(
+            url,
+            headers=_onet_headers(),
+            params=params,
+        )
         response.raise_for_status()
         payload = response.json()
     occupations = payload.get("occupation", [])
@@ -54,15 +63,22 @@ async def onet_search_occupations(keywords: str, limit: int = 20) -> List[Dict[s
 
 async def onet_get_details(soc: str) -> Optional[Dict[str, Any]]:
     _ensure_onet_ready()
-    url = f"{ONET_BASE}/ws/online/occupations/{soc}"
-    skills_url = f"{ONET_BASE}/ws/online/occupations/{soc}/details/skills"
+    url = f"{ONET_BASE}{ONET_DETAILS_PATH.format(soc=soc)}"
+    skills_url = f"{ONET_BASE}{ONET_SKILLS_PATH.format(soc=soc)}"
     params = {"fmt": "json"}
     async with httpx.AsyncClient(timeout=30) as client:
-        details_response = await client.get(url, headers=_onet_headers(), params=params)
+        details_response = await client.get(
+            url,
+            headers=_onet_headers(),
+            params=params,
+        )
         details_response.raise_for_status()
         data = details_response.json()
 
-        skills_response = await client.get(skills_url, headers=_onet_headers())
+        skills_response = await client.get(
+            skills_url,
+            headers=_onet_headers(),
+        )
         skills_response.raise_for_status()
         skills_payload = skills_response.json()
 
@@ -245,5 +261,3 @@ async def adzuna_history_trend(role_title: str, months: int = 12) -> Optional[st
     # Retain one decimal so small movements do not collapse to 0%
     pct_text = f"{pct:.1f}".rstrip("0").rstrip(".")
     return f"{arrow} {pct_text}%".strip()
-
-

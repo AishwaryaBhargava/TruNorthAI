@@ -2,9 +2,9 @@
   <img src="./frontend/src/assets/trunorth/trunorth_icon.svg" width="120" />
 </p>
 
-<h1 align="center">🧭 TruNorth — AI-Powered Career Navigation Platform</h1>
+<h1 align="center">🧭 TruNorth AI — An AI-Powered Career Navigation Platform</h1>
 
-TruNorth is a mobile-first AI career-guidance platform that helps individuals discover strengths, interact with an intelligent AI Coach, explore personalized career paths, and take meaningful action through guided microsteps.  
+TruNorth AI is a mobile-first AI career-guidance platform that helps individuals discover strengths, interact with an intelligent AI Coach, explore personalized career paths, and take meaningful action through guided microsteps.  
 It blends conversational AI, structured inputs, recommendations, and a clear user journey.
 
 ---
@@ -236,7 +236,7 @@ trunorth/
 ### **1. Clone**
 ```
 
-git clone [https://github.com/Tru-North/TruNorth.git](https://github.com/Tru-North/TruNorth.git)
+git clone [https://github.com/AishwaryaBhargava/TruNorthAI.git](https://github.com/AishwaryaBhargava/TruNorthAI.git)
 cd TruNorth
 
 ```

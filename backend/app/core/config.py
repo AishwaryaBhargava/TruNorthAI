@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from pydantic_settings import BaseSettings
+from urllib.parse import quote_plus
 
 load_dotenv()
 
@@ -12,8 +13,8 @@ load_dotenv()
 
 
 DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_USER = quote_plus(os.getenv("DB_USER", ""))
+DB_PASSWORD = quote_plus(os.getenv("DB_PASSWORD", ""))
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 
@@ -23,6 +24,13 @@ FEATURE_ADZUNA = os.getenv("FEATURE_ADZUNA", "true").lower() == "true"
 
 ONET_USER = os.getenv("ONET_USER", "")
 ONET_API_KEY = os.getenv("ONET_API_KEY", "")
+# Default to v2 host (X-API-Key); can override to legacy.
+ONET_BASE = os.getenv("ONET_BASE") or "https://api-v2.onetcenter.org"
+# Allow overriding paths/params to support v1 (/ws/online/...) or v2 endpoints.
+ONET_SEARCH_PATH = os.getenv("ONET_SEARCH_PATH", "/ws/online/search")
+ONET_SEARCH_QUERY_PARAM = os.getenv("ONET_SEARCH_QUERY_PARAM", "keyword")
+ONET_DETAILS_PATH = os.getenv("ONET_DETAILS_PATH", "/ws/online/occupations/{soc}")
+ONET_SKILLS_PATH = os.getenv("ONET_SKILLS_PATH", "/ws/online/occupations/{soc}/details/skills")
 # BLS_API_KEY = os.getenv("BLS_API_KEY", "")
 ADZUNA_APP_ID = os.getenv("ADZUNA_APP_ID", "")
 ADZUNA_APP_KEY = os.getenv("ADZUNA_APP_KEY", "")
@@ -37,6 +45,8 @@ firebase_config = {
     "appId": os.getenv("FIREBASE_APP_ID"),
     "databaseURL": ""
 }
+# Export project ID separately so other modules can log/verify it
+FIREBASE_PROJECT_ID = firebase_config["projectId"]
 FIREBASE_ADMIN_CRED = {
     "type": os.getenv("FIREBASE_TYPE"),
     "project_id": os.getenv("FIREBASE_PROJECT_ID"),
