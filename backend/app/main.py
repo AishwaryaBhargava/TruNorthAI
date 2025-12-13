@@ -26,8 +26,8 @@ app.add_middleware(
     allow_origins=[
         # "https://tru-north-kappa.vercel.app",  # deployed frontend
         # "https://trunorth.onrender.com",       # ✅ backend domain (Render)
-        "https://trunorthai.onrender.com"
-        "https://tru-north-ai.vercel.app"
+        "https://trunorthai.onrender.com",
+        "https://tru-north-ai.vercel.app",
         "http://127.0.0.1:5173",               # local dev server
         "http://localhost:5173"                # alternate local dev URL
     ],
