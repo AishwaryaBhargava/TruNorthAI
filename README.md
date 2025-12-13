@@ -4,6 +4,8 @@
 
 <h1 align="center">🧭 TruNorth AI — An AI-Powered Career Navigation Platform</h1>
 
+🔗 **Live Application:** https://tru-north-ai.vercel.app/
+
 TruNorth AI is a mobile-first AI career-guidance platform that helps individuals discover strengths, interact with an intelligent AI Coach, explore personalized career paths, and take meaningful action through guided microsteps.  
 It blends conversational AI, structured inputs, recommendations, and a clear user journey.
 
